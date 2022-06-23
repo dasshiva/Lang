@@ -1,28 +1,26 @@
 ﻿using System;
-using System.IO;
+using Lexer;
 using CommandLine;
 
 namespace Lang {
 	public class Options {
 		[Option ('f', "file", Required = true, HelpText = "Specifies the input file")]
-		public string File {get; set;} 
+		public string? File {get; set;} 
 	}
 
 	internal class Start {
-		static StringReader? fs = null;
+		static string? file;
 		static void Main(string[] args) {
 			Parser.Default.ParseArguments<Options>(args)
-				.WithParsed(CheckOpts);
-			
+			.WithParsed<Options>(ProcessOpts);
+			LexerMain lex = new LexerMain(file);
+			while (!lex.End) {
+				Console.WriteLine(lex.Next().ToString());
+			}
 		}
 
-		private static void CheckOpts(Options o) {
-			try {
-				fs = new StringReader(o.File);
-			} catch (Exception e) {
-				Console.WriteLine(e.Message);
-				Environment.Exit(-1);
-			}
+		static void ProcessOpts (Options o) {
+			file = o.File;
 		}
 	}
 }
