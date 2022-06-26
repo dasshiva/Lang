@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Lexer {
+namespace Lang.Lexer {
     public enum LexerTokens {
         T_INT, 
         T_DECIMAL, 
@@ -35,35 +35,25 @@ namespace Lexer {
         private int _length = 0;
 
         private bool _end = false;
-        public bool End {get => _end; }
         
         public readonly string File;
 
         private readonly StreamReader src;
 
-        public LexerMain (string src) {
-            try {
-                File = src;
-                this.src = new StreamReader(src);
-            }
-            catch (Exception e) {
-                Console.WriteLine(e.Message);
-                Environment.Exit(1);
-            }
+        public LexerMain (string file) {
+                File = file;
+                src = new StreamReader(file);
         }
 
         private void read() {
-            try {
-                _line = src.ReadLine();
-                if (_line == null)
-                    _end = true; 
-            }
-            catch (Exception) {
-                _end = true;
-                src.Close();
-                src.Dispose();
-            }
-        }
+		_line = src.ReadLine();
+		if (_line == null) {
+    			src.Close();
+    			_end = true; 
+    			return;
+		}
+		_lineno++;
+	}
 
         private LexerResult create_token(string? target) {
             int inum;

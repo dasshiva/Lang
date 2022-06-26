@@ -1,5 +1,5 @@
 ﻿using System;
-using Lexer;
+using Lang.Lexer;
 using CommandLine;
 
 namespace Lang {
@@ -9,18 +9,19 @@ namespace Lang {
 	}
 
 	internal class Start {
-		static string? file;
+		static Options res;
 		static void Main(string[] args) {
 			Parser.Default.ParseArguments<Options>(args)
-			.WithParsed<Options>(ProcessOpts);
-			LexerMain lex = new LexerMain(file);
-			while (!lex.End) {
-				Console.WriteLine(lex.Next().ToString());
+			.WithParsed<Options>(o => res = o);
+			if (res == null)
+				Environment.Exit(-1);
+			try {
+				LexerMain lex = new LexerMain(res.File);
 			}
-		}
-
-		static void ProcessOpts (Options o) {
-			file = o.File;
+			catch (Exception e) {
+				Console.WriteLine(e.Message);
+				Environment.Exit(-1);
+			}
 		}
 	}
 }
